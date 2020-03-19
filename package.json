@@ -1,0 +1,15 @@
+{
+  "name": "chess-semestral-project",
+  "version": "1.0.0",
+  "description": "Semestral project for KAJ",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src -d dist"
+  },
+  "author": "Martin Mašata",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-latest": "^6.24.1"
+  }
+}
