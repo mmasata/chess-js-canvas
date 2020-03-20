@@ -1,9 +1,21 @@
-<html>
+<!DOCTYPE html>
         <head>
                 <link rel="stylesheet" type="text/css" href="css/index.css">
         </head>
         <body>
-                <canvas id="gameContent"></canvas>
+                <section>
+                        <canvas id="gameLayer"></canvas>
+                        <canvas id="gameBackgroundLayer"></canvas>
+                        <canvas id="menuLayer"></canvas>
+                        <canvas id="menubackgroundLayer"></canvas>
+                        <div id="modal">
+                                <div id="initbtnContainer">
+                                        <img id="init" src="img/init.png" height="200" width="200">
+                                </div>
+                        </div>
+                        <img id="mainMenuBackgroundImg" hidden src="img/mainMenuBackground.jpg">
+                </section>
+                
                 <script type="module" src="js/index.js"></script>
         </body>
 </html>
