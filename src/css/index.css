@@ -35,5 +35,5 @@ html, body {
 canvas { position: absolute; display: block; }
 #gameLayer { z-index: 4; }
 #gameBackgroundLayer { z-index: 3; }
-#menuLayer { z-index: 2; }
+#menuLayer { z-index: 200; }
 #menubackgroundLayer { z-index: 1; }
