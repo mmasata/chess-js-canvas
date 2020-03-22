@@ -1,13 +1,19 @@
+import {NpcGame} from './../game/npcGame.js';
+import {PlayerGame} from './../game/playerGame.js';
+
+
 //trida, ktera bude tvorit menu v canvasu
 export class Menu {
         //vyuzivam statickeho pristupu z duvodu, ze v listeneru nejsem v kontextu tridy a nejsem schopen pouzit this
         static reference = this;
 
-        constructor(){
+        constructor(menuBackground){
                 //canvas a context menu
                 this.canvas = document.getElementById("menuLayer");
                 this.ctx = this.canvas.getContext('2d');
                 Menu.reference = this;
+
+                this.menuBackground = menuBackground;
 
                 //konfiguracni json, ktery tvori strukturu menu a jejich prokliky kam miri
                 this.conf = {
@@ -28,6 +34,15 @@ export class Menu {
                         settingsMenu : [
                                 {name : "Back" , linkTo : "mainMenu"},
                                 {name : "Sound" , linkTo : "fc_enableDisableSound"} 
+                        ],
+                        settingsInGameMenu : [
+                                {name : "Back" , linkTo : "inGameMenu"},
+                                {name : "Sound" , linkTo : "fc_enableDisableSound"} 
+                        ],
+                        inGameMenu : [
+                                {name : "Resume" , linkTo : "fc_hideMenu"},
+                                {name : "Settings" , linkTo : "settingsInGameMenu"},
+                                {name : "End Game" , linkTo : "mainMenu"},
                         ]
                 
                 };
@@ -119,7 +134,8 @@ export class Menu {
                 if(result){
                         let redirectTo = result.linkTo;
                         if(redirectTo.includes('fc_')){
-                                //volame funkci
+                                let fcName = redirectTo.split("_")[1];
+                                eval("Menu.reference." + fcName + "()");
                         }
                         else {
                                 Menu.reference.clearCanvas();
@@ -148,10 +164,37 @@ export class Menu {
                 }               
         }
 
+        //spusti uvodni pisnicku
         playThemeSong(){
-                let audio = new Audio();
-                audio.src = '../../audio/themeSong.mp3';
-                audio.load();
-                audio.play();    
+                this.themeSong = new Audio();
+                this.themeSong.src = '../../audio/themeSong.mp3';
+                this.themeSong.loop = true;
+                this.themeSong.load();
+                this.themeSong.play();    
+        }
+
+        //zastavi uvodni pisnicku
+        stopThemeSong(){
+                this.themeSong.pause();
+        }
+
+        //zacne hru proti npc
+        startGameNpc(){
+                this.game = new NpcGame();
+                this.game.resizeChessBoard();  
+                this.visibility = false;
+                this.clearCanvas();
+                this.menuBackground.clearCanvas();
+                this.stopThemeSong();
+        }
+
+        //zacne hru proti hraci
+        startGamePlayer(){
+                this.game = new PlayerGame();
+                this.game.resizeChessBoard();  
+                this.visibility = false;
+                this.clearCanvas();
+                this.menuBackground.clearCanvas();
+                this.stopThemeSong();
         }
 }

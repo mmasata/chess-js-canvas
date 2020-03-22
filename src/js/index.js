@@ -3,7 +3,7 @@ import { MenuBackground } from './menu/backgroundMenu.js';
 
 
 const menuBackground = new MenuBackground();
-const menu = new Menu();
+const menu = new Menu(menuBackground);
 //naslouchac na spousteci tlacitko
 //vyvola hlavni menu, a spusti hlavni hudbu
 document.getElementById("init").addEventListener('click' , function(){
@@ -22,13 +22,24 @@ const resizeCanvases = () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
         });
+};
+
+//prekresli canvas objekty
+const redrawCanvases = () => {
         if(menu.isVisible()){
                 //menu things
                 menu.redrawResizedCurrentMenuSection();
         }
         else {
                 //game things
-        }
-};
+                menu.game.resizeChessBoard();
+        }     
+}
+
+//zmeni velikost a prekresli canvas objekty
+const resizeAndRedrawCanvases = () => {
+        resizeCanvases();
+        redrawCanvases();
+}
 //naslouchac reagujici na zmenu velikosti obrazovky
-window.addEventListener('resize' , resizeCanvases);
+window.addEventListener('resize' , resizeAndRedrawCanvases);
