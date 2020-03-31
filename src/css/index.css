@@ -33,7 +33,3 @@ html, body {
 
 
 canvas { position: absolute; display: block; }
-#gameLayer { z-index: -999; }
-#gameBackgroundLayer { z-index: -999; }
-#menuLayer { z-index: 2; }
-#menubackgroundLayer { z-index: 1; }
