@@ -16,10 +16,6 @@ export class Component{
                 */
                 this.config = config;
                 this.layer;
-
-                if(this.constructor === Component){
-                        throw new TypeError('Abstraktní třídu nelze instancovat');
-                }
         }
 
         //nastavi vrstvu komponenty
@@ -73,20 +69,43 @@ export class Component{
         }
 
         //akce vyvolana stisknutim tlacitka na komponente
-        onClick(){
-                //TODO
+        onClick(fc=null){
+                if(fc){
+                        Object.assign(this, {onClick(){
+                                fc();
+                                }
+                        });
+                }
         }
 
         //akce vyvolana prejetim mysi na komponentu
-        onMouseOver(){
-                //TODO
+        onMouseOver(fc=null){
+                if(fc){
+                        Object.assign(this, {onMouseOver(){
+                                fc();
+                                }
+                        }); 
+                }             
         }
 
         //akce vyvolana prejetim mysi z komponenty mimo
-        onMouseOut(){
-                //TODO
+        onMouseOut(fc=null){
+                if(fc){
+                        Object.assign(this, {onMouseOut(){
+                                fc();
+                                }
+                        });  
+                } 
         }
 
+        //akce vyvolana pri dragAndDropu
+        dragAndDrop(fc=null){
+                if(fc){
+                        Object.assign(this, {dragAndDrop(){
+                                fc();
+                                }
+                        });   
+                }    
+        }
 
-        //TODO jeste drag and drop
 }

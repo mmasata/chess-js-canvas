@@ -1,4 +1,3 @@
-import {Layer} from './layer.js';
 import { RenderManager } from './renderManager.js';
 
 export class Game {

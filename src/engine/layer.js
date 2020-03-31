@@ -1,10 +1,9 @@
-import {Component} from './abstractComponent.js';
-
 export class Layer {
 
         constructor(name){
-                this.name = name;
+                //seznam komponent je jako u vrstev, prvni je vzadu a posledni element je nejvice vepredu
                 this.components = [];
+                this.name = name;
                 this.game;
         }
 

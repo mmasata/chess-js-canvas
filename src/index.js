@@ -1,23 +1,10 @@
 import {Game} from './engine/game.js';
-import {Component} from './engine/abstractComponent.js';
-import { Layer } from './engine/layer.js';
+import {Component} from './engine/component.js';
+import {Layer} from './engine/layer.js';
 
-//v pripade ze je width a height hodnota full, pak bude na celou stranku a bude se automaticky menit velikost pri zmene velikosti obrazovky
-//jdou take nastavit cisla vyjadrujici pixely
-const gameConfig = {
-        width: 'full',
-        height: 'full',
-        canvas: 'game'
-}
-
-const game = new Game(gameConfig);
-
+//Funkce init slouzi pro tvorbu hry
 const init = () => {
-        document.getElementById("modal").style.display = "none";
-
-        //zde nastavujeme jiz hru
-        //TODO
-        let blue = new MyComponent2({
+        let blue = new Component({
                 name : "BLUE_COMPONENT",
                 x: 'CW/2-200',
                 y: 'CH/2',
@@ -27,7 +14,7 @@ const init = () => {
                 color: 'blue',
                 dragAndDrop: true
         });
-        let red = new MyComponent({
+        let red = new Component({
                 name : "RED_COMPONENT",
                 x: 'CW/2-100',
                 y: 'CH/2+100',
@@ -37,6 +24,14 @@ const init = () => {
                 color: 'red',
                 dragAndDrop: false
         });
+
+        //takhle si muzeme nadefinovat metody onClick, onMouseOver, onMouseOut a dragAndDrop
+        let alertMe = ()=>{
+                console.log("JUUUU");
+        }
+        red.onMouseOver(alertMe);
+
+
         let down = new Layer('DOLNI_VRSTVA');
         let upper = new Layer('HORNI_VRSTVA');
 
@@ -49,28 +44,17 @@ const init = () => {
         
 }
 
+
+//v pripade ze je width a height hodnota full, pak bude na celou stranku a bude se automaticky menit velikost pri zmene velikosti obrazovky
+//jdou take nastavit cisla vyjadrujici pixely
+const gameConfig = {
+        width: 'full',
+        height: 'full',
+        canvas: 'game'
+}
+const game = new Game(gameConfig);
 //naslouchac na spousteci tlacitko
-document.getElementById("init").addEventListener('click' , init);
-
-
-class MyComponent extends Component {
-
-        constructor(config){
-                super(config);
-        }
-
-        onClick(){
-                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        }
-}
-
-class MyComponent2 extends Component {
-
-        constructor(config){
-                super(config);
-        }
-
-        onMouseOver(){
-                console.log('jsem tam');
-        }
-}
+document.getElementById("init").addEventListener('click' , ()=>{
+        document.getElementById("modal").style.display = "none";
+        init();    
+});

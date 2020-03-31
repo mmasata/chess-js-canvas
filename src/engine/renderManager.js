@@ -32,7 +32,7 @@ export class RenderManager{
                         //drag and drop
                         if(this.draggingComponent != null){
                                 this._dragAndDrop(e, this.draggingComponent);
-                                return;
+                                this.draggingComponent.dragAndDrop();
                         }
                         //mouseover
                         else if(!this.mouseMoveActiveComponent && (this.mouseMoveActiveComponent = this._getMouseActiveComponent(e))){
@@ -74,7 +74,7 @@ export class RenderManager{
                         this.draggingComponent = null;
                 });
 
-                //refreshovani hry, defaultne nastaveno na 30fps
+                //refreshovani hry, defaultne nastaveno na 60fps
                 setInterval( ()=> {
                         this.redraw();
                      }, 1000/60);
