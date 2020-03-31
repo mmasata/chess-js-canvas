@@ -22,8 +22,8 @@ const init = () => {
                 x: 'CW/2-200',
                 y: 'CH/2',
                 w: '200',
-                h: '200',
-                object: 'rect',
+                h: '50',
+                object: 'ellipse',
                 color: 'blue',
                 dragAndDrop: true
         });
@@ -68,5 +68,9 @@ class MyComponent2 extends Component {
 
         constructor(config){
                 super(config);
+        }
+
+        onMouseOver(){
+                console.log('jsem tam');
         }
 }

@@ -33,11 +33,16 @@ export class RenderManager{
                         if(this.draggingComponent != null){
                                 this._dragAndDrop(e, this.draggingComponent);
                                 return;
-                        };
-
-                        //TODO kdyz je neco v resultComponents a mouseMoveActiveComponents ne, pak nastala mouseOver
-                        //TODO kdyz je neco v resultComponents a taky v mouseMoveActiveComponents, pak nic neneastalo
-                        //TODO kdyz neco neni v resultComponents a v mouseMoveActiveComponents je, pak nastava mouseOut
+                        }
+                        //mouseover
+                        else if(!this.mouseMoveActiveComponent && (this.mouseMoveActiveComponent = this._getMouseActiveComponent(e))){
+                                this.mouseMoveActiveComponent.onMouseOver();
+                        }
+                        //mouse out
+                        else if(this.mouseMoveActiveComponent && !(this._getMouseActiveComponent(e))) {
+                                this.mouseMoveActiveComponent.onMouseOut();
+                                this.mouseMoveActiveComponent = null;
+                        }
                 });
 
                 //naslouchac na klikani mysi
@@ -55,7 +60,7 @@ export class RenderManager{
                 this.draggingComponent = null;
                 canvas.addEventListener('mousedown', (e)=>{
                         let resultComponent = this._getMouseActiveComponent(e);
-                        if(resultComponent.config.dragAndDrop){
+                        if(resultComponent && resultComponent.config.dragAndDrop){
                                 this.draggingComponent = resultComponent;
                                 this.draggingStartX = e.clientX - canvas.getBoundingClientRect().left;
                                 this.draggingStartY = e.clientY - canvas.getBoundingClientRect().top;
@@ -128,11 +133,11 @@ export class RenderManager{
                 ctx.beginPath();
                 ctx.fillStyle= config.color;
 
-                //typ geometrickeho objektu
+                //kdyz je komponenta rectangle
                 if(config.object === 'rect'){
                         ctx.rect(x,y,w,h);
                 }
-                //TODO ostatni typu geo objektu
+                //kdyz je komponenta elipsa(popripade kruh)
                 else if(config.object === 'ellipse'){
                         ctx.ellipse(x, y, w, h, 0, 0, 2 * Math.PI);
                 }
@@ -158,11 +163,22 @@ export class RenderManager{
                                 let y = this._calculateComponentConfigValue(config.y);
                                 let w = this._calculateComponentConfigValue(config.w);
                                 let h = this._calculateComponentConfigValue(config.h);
-                                if ((mouseX >= x) && (mouseX <= w + x)) {
-                                        if ((mouseY >= y) && (mouseY <= h + y)) {
+
+                                //pocitani zda je mys v rectangle
+                                if(config.object === 'rect'){
+                                        if ((mouseX >= x) && (mouseX <= w + x)) {
+                                                if ((mouseY >= y) && (mouseY <= h + y)) {
+                                                        return components[z];
+                                                }
+                                        }   
+                                }
+                                //pocitani zda je mys v elipse(popripade kruhu)
+                                else if(config.object === 'ellipse') {
+                                        let equation = ((Math.pow((mouseX-x),2)/Math.pow(w,2))+(Math.pow((mouseY-y),2)/Math.pow(h,2)));
+                                        if(equation<=1){
                                                 return components[z];
                                         }
-                                }     
+                                }
                         }
                 }
                 return null;
