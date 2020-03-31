@@ -27,10 +27,13 @@ export class RenderManager{
 
 
                 //naslouchac na pozicovani mysi
-                this.mouseMoveActiveComponents = [];
+                this.mouseMoveActiveComponent = null;
                 canvas.addEventListener('mousemove' , (e)=>{
                         //drag and drop
-                        if(this.dragging){this._dragAndDrop(e)};
+                        if(this.draggingComponent != null){
+                                this._dragAndDrop(e, this.draggingComponent);
+                                return;
+                        };
 
                         //TODO kdyz je neco v resultComponents a mouseMoveActiveComponents ne, pak nastala mouseOver
                         //TODO kdyz je neco v resultComponents a taky v mouseMoveActiveComponents, pak nic neneastalo
@@ -39,43 +42,37 @@ export class RenderManager{
 
                 //naslouchac na klikani mysi
                 canvas.addEventListener('click', (e)=>{
-                        let resultComponents = this._getMouseActiveComponents(e);
+                        let resultComponent = this._getMouseActiveComponent(e);
                         //zavola metodu klik dane komponenty, bude zavolana posledni komponenta, protoze podle razeni prave ta je v nejvyssi vrstve a nejvyse
-                        if(resultComponents.length>0){
-                                resultComponents[resultComponents.length-1].onClick();
+                        if(resultComponent){
+                                resultComponent.onClick();
                         }
                 });
 
                 //naslouchac na stisknuti mysi a drzeni... slouzi pro drag and drop
                 this.draggingStartX = null;
                 this.draggingStartY = null;
-                this.dragging = false;
+                this.draggingComponent = null;
                 canvas.addEventListener('mousedown', (e)=>{
-                        for(let component of this._getMouseActiveComponents(e)){
-                            if(component.config.dragAndDrop){
-                                component.isDragging = true;
-                                this.dragging = true;
+                        let resultComponent = this._getMouseActiveComponent(e);
+                        if(resultComponent.config.dragAndDrop){
+                                this.draggingComponent = resultComponent;
                                 this.draggingStartX = e.clientX - canvas.getBoundingClientRect().left;
                                 this.draggingStartY = e.clientY - canvas.getBoundingClientRect().top;
-                            }    
-                        }
+                            } 
                 });
 
                 //naslouchac na odmacknuti tlacitka mysi... prenastavi promennou isDragging vsem komponentam na false
                 canvas.addEventListener('mouseup' , (e)=>{
-                        for(let component of this._getAllGamecomponents()){
-                                component.isDragging = false;
-                        }
                         this.draggingStartX = null;
                         this.draggingStartY = null;
-                        this.dragging = false;
+                        this.draggingComponent = null;
                 });
 
                 //refreshovani hry, defaultne nastaveno na 30fps
-                //mouseMove se bude take dotazovat 30x za vterinu
                 setInterval( ()=> {
                         this.redraw();
-                     }, 1000/30);
+                     }, 1000/60);
         }
 
 
@@ -145,28 +142,30 @@ export class RenderManager{
 
         }
 
-        //vraci vsechny komponenty, na kterych je zrovna pozice mysi
-        _getMouseActiveComponents(e){
+        //vracim prvni komponentu na kteoru narazim
+        //jelikoz iteruji odzadu, pak je to prave ta nejprednejsi
+        _getMouseActiveComponent(e){
                 let canvas = document.getElementById(this.config.canvas);
                 let mouseX = e.clientX - canvas.getBoundingClientRect().left;
                 let mouseY = e.clientY - canvas.getBoundingClientRect().top;
-                let resultComponents = [];
+                let layers = this.game.getAllLayers();
 
-                for(let layer of this.game.getAllLayers()){
-                        for(let component of layer.getComponents()){
-                                let config = component.getConfig();
+                for(let i=(layers.length-1); i>-1; i--){
+                        let components = layers[i].getComponents();
+                        for(let z=(components.length-1); z>-1; z--){
+                                let config = components[z].getConfig();
                                 let x = this._calculateComponentConfigValue(config.x);
                                 let y = this._calculateComponentConfigValue(config.y);
                                 let w = this._calculateComponentConfigValue(config.w);
                                 let h = this._calculateComponentConfigValue(config.h);
                                 if ((mouseX >= x) && (mouseX <= w + x)) {
                                         if ((mouseY >= y) && (mouseY <= h + y)) {
-                                                resultComponents.push(component);
+                                                return components[z];
                                         }
-                                }    
+                                }     
                         }
                 }
-                return resultComponents;
+                return null;
         }
 
         //vraci vsechny komponenty ve vsech vrstvach
@@ -181,22 +180,17 @@ export class RenderManager{
         }
 
         //metoda zajistujici drag and drop komponent
-        _dragAndDrop(e){
+        _dragAndDrop(e, component){
                 let canvas = document.getElementById(this.config.canvas);
-                let resultComponents = this._getMouseActiveComponents(e);
-                for(let component of resultComponents){
-                        if(component.isDragging){
-                                //ziskame aktualni pozici mysi
-                                let currentX = e.clientX - canvas.getBoundingClientRect().left;
-                                let currentY = e.clientY - canvas.getBoundingClientRect().top;
+                //ziskame aktualni pozici mysi
+                let currentX = e.clientX - canvas.getBoundingClientRect().left;
+                let currentY = e.clientY - canvas.getBoundingClientRect().top;
 
-                                //TODO pridavaji se furt stringy, je treba vylepsit v pripade pouziti CW, CH u komponenty
-                                component.getConfig().x +='+' + (currentX - this.draggingStartX);
-                                component.getConfig().y += '+' + (currentY - this.draggingStartY);
+                //TODO pridavaji se furt stringy, je treba vylepsit v pripade pouziti CW, CH u komponenty
+                component.getConfig().x +='+' + (currentX - this.draggingStartX);
+                component.getConfig().y += '+' + (currentY - this.draggingStartY);
 
-                                this.draggingStartX = currentX;
-                                this.draggingStartY = currentY;
-                        }
-                }               
+                this.draggingStartX = currentX;
+                this.draggingStartY = currentY;            
         }
 }

@@ -23,7 +23,7 @@ const init = () => {
                 y: 'CH/2',
                 w: '200',
                 h: '200',
-                object: 'ellipse',
+                object: 'rect',
                 color: 'blue',
                 dragAndDrop: true
         });

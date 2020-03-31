@@ -17,10 +17,6 @@ export class Component{
                 this.config = config;
                 this.layer;
 
-                //boolean zda je zmacknuta mys nad toutu komponentou. slouzi pro drag and drop
-                this.isDragging = false;
-
-
                 if(this.constructor === Component){
                         throw new TypeError('Abstraktní třídu nelze instancovat');
                 }
