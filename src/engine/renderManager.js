@@ -150,6 +150,10 @@ export class RenderManager{
                 else if(config.object === 'ellipse'){
                         ctx.ellipse(x, y, w, h, 0, 0, 2 * Math.PI);
                 }
+                //kdyz je to obrazek
+                else if(config.object === 'image'){
+                        ctx.drawImage(config.image, x, y, w , h);
+                }
 
                 //pridani do kontextu
                ctx.fill();
@@ -173,7 +177,7 @@ export class RenderManager{
                                 let h = this._calculateComponentConfigValue(config.h);
 
                                 //pocitani zda je mys v rectangle
-                                if(config.object === 'rect'){
+                                if(config.object === 'rect' || config.object === 'image'){
                                         if ((mouseX >= x) && (mouseX <= w + x)) {
                                                 if ((mouseY >= y) && (mouseY <= h + y)) {
                                                         return components[z];
@@ -214,13 +218,13 @@ export class RenderManager{
                 //TODO pridavaji se furt stringy, je treba vylepsit v pripade pouziti CW, CH u komponenty
                 if(component.getConnector()!= null){
                        for(let comp of component.getConnector().getComponents()){
-                                comp.getConfig().x +='+' + (currentX - this.draggingStartX);
-                                comp.getConfig().y += '+' + (currentY - this.draggingStartY);
+                                comp.getConfig().x +=(currentX - this.draggingStartX);
+                                comp.getConfig().y +=(currentY - this.draggingStartY);
                        } 
                 }
                 else {
-                        component.getConfig().x +='+' + (currentX - this.draggingStartX);
-                        component.getConfig().y += '+' + (currentY - this.draggingStartY);
+                        component.getConfig().x +=(currentX - this.draggingStartX);
+                        component.getConfig().y +=(currentY - this.draggingStartY);
                 }
                 this.draggingStartX = currentX;
                 this.draggingStartY = currentY;

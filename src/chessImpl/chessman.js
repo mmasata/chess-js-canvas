@@ -1,70 +1,82 @@
 //trida figurky, ze ktere budou dedit vsechny druhu figurek
 //jednotlivi potomci budou mit jina pravidla pohybu
-class Chessman {
+import {Component} from '../engine/component.js';
 
-        constructor(color, player, type){
-                this.color = color;
-                this.player = player;
+export class Chessman extends Component {
+
+        constructor(config, type){
+                super(config);
+                this.color = config.color;
                 this.type = type;
+                
         }
 
         getColor() {
                 return this.color;
         }
              
-        getPlayer() {
-                return this.player;
-        }
         getType() {
                 return this.type;
+        }
+
+        _setFigureImage(imageName){
+                let image = new Image();
+                image.src = '../img/' + imageName + '.png';
+                this.config.image = image;
         }
 
 }
 
 //trida pesaka
-class Pawn extends Chessman {
+export class Pawn extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'Pawn');
+        constructor (config) {
+                super(config, 'Pawn');
+                (config.color === 'black') ? this._setFigureImage('pawn_black') : this._setFigureImage('pawn_white');
         }
 }
 
 //trida veze
-class Rook extends Chessman {
+export class Rook extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'Rook');
+        constructor (config) {
+                super(config, 'Rook');
+                (config.color === 'black') ? this._setFigureImage('rook_black') : this._setFigureImage('rook_white');
         }
 }
 
 //trida jezdce
-class Knight extends Chessman {
+export class Knight extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'Knight');
+        constructor (config) {
+                super(config, 'Knight');
+                (config.color === 'black') ? this._setFigureImage('knight_black') : this._setFigureImage('knight_white');
         }
 }
 
 //trida strelce
-class Bishop extends Chessman {
+export class Bishop extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'Bishop');
+        constructor (config) {
+                super(config, 'Bishop');
+                (config.color === 'black') ? this._setFigureImage('bishop_black') : this._setFigureImage('bishop_white');
         }
 }
 
 //trida damy
-class Queen extends Chessman {
+export class Queen extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'Queen');
+        constructor (config) {
+                super(config, 'Queen');
+                (config.color === 'black') ? this._setFigureImage('queen_black') : this._setFigureImage('queen_white');
         }
 }
 
 //trida krale
-class King extends Chessman {
+export class King extends Chessman {
 
-        constructor (color, player) {
-                super(color, player, 'King');
+        constructor (config) {
+                super(config, 'King');
+                (this.config.color === 'black') ? this._setFigureImage('king_black') : this._setFigureImage('king_white');
         }
 }
