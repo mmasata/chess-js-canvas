@@ -6,6 +6,9 @@ export class Game {
                 this.renderManager = new RenderManager(config, this);
                 this.config = config;
                 this.layers = [];
+                
+                //vezme offscreen layers a ty bude renderovat zvlast
+                this.offScreenLayer = null;
         }
 
         //vraci referenci na renderManagera
@@ -18,6 +21,20 @@ export class Game {
         getConfig(){
                 //console.log('Vracím configFile');
                 return this.config;
+        }
+
+
+        //prida vrstvu do hry
+        setOffscreenLayer(layer){
+                layer._setGame(this);
+                //prida vrstvu do canvasu
+                this.offScreenLayer = layer;
+                //console.log('Přidávám vrstvu');
+                this.renderManager.initOffScreen();
+        }
+        
+        getOffscreenLayer(){
+                return this.offScreenLayer;
         }
 
         //prida vrstvu do hry

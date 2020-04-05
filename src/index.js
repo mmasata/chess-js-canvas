@@ -1,45 +1,30 @@
 import {Game} from './engine/game.js';
 import {Component} from './engine/component.js';
 import {Layer} from './engine/layer.js';
+import {ComponentConnector} from './engine/componentConnector.js';
+import { Chessboard } from './chessImpl/chessboard.js';
 
 //Funkce init slouzi pro tvorbu hry
 const init = () => {
+        const chessboard = new Chessboard(game);
+        const chessboardLayer  = new Layer('Chessboard_layer', true);
+        chessboardLayer.addComponents(chessboard.getSquares());
+        game.setOffscreenLayer(chessboardLayer);
+
+        
         let blue = new Component({
                 name : "BLUE_COMPONENT",
                 x: 'CW/2-200',
                 y: 'CH/2',
-                w: '200',
-                h: '50',
-                object: 'ellipse',
+                w: '100',
+                h: '100',
+                object: 'rect',
                 color: 'blue',
                 dragAndDrop: true
         });
-        let red = new Component({
-                name : "RED_COMPONENT",
-                x: 'CW/2-100',
-                y: 'CH/2+100',
-                w: '300',
-                h: '300',
-                object: 'rect',
-                color: 'red',
-                dragAndDrop: false
-        });
-
-        //takhle si muzeme nadefinovat metody onClick, onMouseOver, onMouseOut a dragAndDrop
-        red.onMouseOver(() =>{
-                console.log("mys pres");
-        });
-
-
-        let down = new Layer('DOLNI_VRSTVA');
-        let upper = new Layer('HORNI_VRSTVA');
-
-        game.addLayer(down);
-        game.addLayer(upper);
-
-        down.addComponent(blue);
-        upper.addComponent(red);
-
+        const chessmanLayer = new Layer("Chessman_Layer" , false);
+        chessmanLayer.addComponent(blue);
+        game.addLayer(chessmanLayer);
         
 }
 

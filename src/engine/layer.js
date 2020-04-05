@@ -1,7 +1,9 @@
 export class Layer {
 
-        constructor(name){
+        constructor(name, isStatic){
                 //seznam komponent je jako u vrstev, prvni je vzadu a posledni element je nejvice vepredu
+                //kdyz je static, pak bude reagovat jen na resize, jinak se nehybe
+                this.static = isStatic;
                 this.components = [];
                 this.name = name;
                 this.game;
@@ -27,9 +29,12 @@ export class Layer {
                 return this.components;
         }
 
+        addComponents(components){
+                this.components = this.components.concat(components);
+        }
+
         //prida komponentu do vrstvy
         addComponent(component){
-                component._setLayer(this);
                 this.components.push(component);
                 //console.log('Přidávám komponentu');
         }

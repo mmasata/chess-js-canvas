@@ -19,13 +19,8 @@ export class Component{
                 //diky nemu muze probihat drag and drop nad nejakymi spojenymi komponenty, ktere tvori jiny spolecny objekt
                 this.componentConnector = null;
                 this.config = config;
-                this.layer;
         }
 
-        //nastavi vrstvu komponenty
-        _setLayer(layer){
-                this.layer = layer;
-        }
 
         //nastavi komponent konektora
         setConnector(connector){
@@ -35,11 +30,6 @@ export class Component{
         //vrati komponent konektora
         getConnector(){
                 return this.componentConnector;
-        }
-
-        //vrati vrstvu komponenty
-        getLayer(){
-                return this.layer;
         }
 
         //vrati config pro komponentu

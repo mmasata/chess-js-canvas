@@ -1,4 +1,4 @@
-export class componentConnector{
+export class ComponentConnector{
 
         //konektor sdruzuje vice komponent do jedne
         //slouzi pro spojeni pri tvorbe slozitejsich obrazku pomoci vice objektu, aby fungoval spolecny klik, dragAndDrop, ...
@@ -8,6 +8,7 @@ export class componentConnector{
 
         //metoda pridavajici komponentu do konektoru
         addComponent(component){
+                component.setConnector(this);
                 this.components.push(component);
         }
 
@@ -15,16 +16,13 @@ export class componentConnector{
         removeComponent(component){
                 for(let i=0; i<this.components.length; i++){
                         if(this.components[i] === component){
+                                component.setConnector(null);
                                 this.components.splice(i, 1);
                                 return;
                         }
                 }
         }
 
-        //odstrani vsechny komponenty z konektoru
-        removeAllComponents(){
-                this.components = [];
-        }
 
         //vraci seznam komponent
         getComponents(){

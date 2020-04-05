@@ -3,6 +3,7 @@ export class RenderManager{
         constructor(config, game){
                 this.config = config;
                 this.game = game;
+                
 
                 //nastavi canvas sirku a vysku
                 //kdyz je hodnota full, pak pridame naslouchace aby reagoval na zmenu velikosti
@@ -14,6 +15,8 @@ export class RenderManager{
                         window.addEventListener('resize', ()=>{
                                 canvas.width = window.innerWidth;
                                 canvas.height = window.innerHeight;
+                                if(this.game.getOffscreenLayer()){this.initOffScreen();}
+                                this.redraw();
                                 //console.log('Velikost canvasu aktualizována');
                         });
                         //console.log('Canvas nastaven na fullScreen a s responzivitou');
@@ -29,17 +32,20 @@ export class RenderManager{
                 //naslouchac na pozicovani mysi
                 this.mouseMoveActiveComponent = null;
                 canvas.addEventListener('mousemove' , (e)=>{
+                        let currentComponent = this._getMouseActiveComponent(e);
                         //drag and drop
                         if(this.draggingComponent != null){
                                 this._dragAndDrop(e, this.draggingComponent);
                                 this.draggingComponent.dragAndDrop();
                         }
                         //mouseover
-                        else if(!this.mouseMoveActiveComponent && (this.mouseMoveActiveComponent = this._getMouseActiveComponent(e))){
+                        else if(!this.mouseMoveActiveComponent && (this.mouseMoveActiveComponent = currentComponent)){
+                                (this.mouseMoveActiveComponent.config.dragAndDrop) ? canvas.style.cursor = 'pointer' : '';
                                 this.mouseMoveActiveComponent.onMouseOver();
                         }
                         //mouse out
-                        else if(this.mouseMoveActiveComponent && !(this._getMouseActiveComponent(e))) {
+                        else if(this.mouseMoveActiveComponent &&  (currentComponent != this.mouseMoveActiveComponent) ) {
+                                (this.mouseMoveActiveComponent.config.dragAndDrop) ? canvas.style.cursor = 'auto' : '';
                                 this.mouseMoveActiveComponent.onMouseOut();
                                 this.mouseMoveActiveComponent = null;
                         }
@@ -64,7 +70,7 @@ export class RenderManager{
                                 this.draggingComponent = resultComponent;
                                 this.draggingStartX = e.clientX - canvas.getBoundingClientRect().left;
                                 this.draggingStartY = e.clientY - canvas.getBoundingClientRect().top;
-                            } 
+                            }
                 });
 
                 //naslouchac na odmacknuti tlacitka mysi... prenastavi promennou isDragging vsem komponentam na false
@@ -95,6 +101,9 @@ export class RenderManager{
                 let mainCanvas = document.getElementById(this.config.canvas);
                 let mainCtx = mainCanvas.getContext('2d');
                 let layersArr = this.game.getAllLayers();
+                if(mainCanvas.offscreenCanvas != undefined){
+                        mainCtx.drawImage(mainCanvas.offscreenCanvas, 0, 0);
+                }
                 for(let layer of layersArr){
                         let canvas = document.createElement("CANVAS");
                         canvas.width = mainCanvas.width;
@@ -154,7 +163,6 @@ export class RenderManager{
                 let mouseX = e.clientX - canvas.getBoundingClientRect().left;
                 let mouseY = e.clientY - canvas.getBoundingClientRect().top;
                 let layers = this.game.getAllLayers();
-
                 for(let i=(layers.length-1); i>-1; i--){
                         let components = layers[i].getComponents();
                         for(let z=(components.length-1); z>-1; z--){
@@ -170,7 +178,7 @@ export class RenderManager{
                                                 if ((mouseY >= y) && (mouseY <= h + y)) {
                                                         return components[z];
                                                 }
-                                        }   
+                                        }
                                 }
                                 //pocitani zda je mys v elipse(popripade kruhu)
                                 else if(config.object === 'ellipse') {
@@ -192,7 +200,7 @@ export class RenderManager{
                                 resultComponents.push(component);
                         }
                 }
-                return resultComponents;     
+                return resultComponents;
         }
 
         //metoda zajistujici drag and drop komponent
@@ -202,11 +210,36 @@ export class RenderManager{
                 let currentX = e.clientX - canvas.getBoundingClientRect().left;
                 let currentY = e.clientY - canvas.getBoundingClientRect().top;
 
+                //kdyz neni null, pak jde o sadu spojenych komponent, a budeme hybat vsemi
                 //TODO pridavaji se furt stringy, je treba vylepsit v pripade pouziti CW, CH u komponenty
-                component.getConfig().x +='+' + (currentX - this.draggingStartX);
-                component.getConfig().y += '+' + (currentY - this.draggingStartY);
-
+                if(component.getConnector()!= null){
+                       for(let comp of component.getConnector().getComponents()){
+                                comp.getConfig().x +='+' + (currentX - this.draggingStartX);
+                                comp.getConfig().y += '+' + (currentY - this.draggingStartY);
+                       } 
+                }
+                else {
+                        component.getConfig().x +='+' + (currentX - this.draggingStartX);
+                        component.getConfig().y += '+' + (currentY - this.draggingStartY);
+                }
                 this.draggingStartX = currentX;
-                this.draggingStartY = currentY;            
+                this.draggingStartY = currentY;
+        }
+
+        //metoda pripravujici offscreen vrstvu
+        //slouzici pro optimalizaci, kam budeme davat pouze staticke veci
+        initOffScreen(){
+                let layer = this.game.getOffscreenLayer();
+                let canvas = document.getElementById(this.config.canvas);
+                let ctx = canvas.getContext('2d');
+                canvas.offscreenCanvas = document.createElement("CANVAS");
+                canvas.offscreenCanvas.width = canvas.width;
+                canvas.offscreenCanvas.height = canvas.height;
+                let ctxOffscreen = canvas.offscreenCanvas.getContext('2d');
+                for(let component of layer.getComponents()){
+                        let config = component.getConfig();
+                        this._drawComponent(ctxOffscreen, config);
+                        //console.log('Vykresluji komponentu "'+config.name+'" do vrstvy "'+layer.getName()+'"');
+                }
         }
 }
