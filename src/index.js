@@ -26,10 +26,9 @@ const init = () => {
         });
 
         //takhle si muzeme nadefinovat metody onClick, onMouseOver, onMouseOut a dragAndDrop
-        let alertMe = ()=>{
-                console.log("JUUUU");
-        }
-        red.onMouseOver(alertMe);
+        red.onMouseOver(() =>{
+                console.log("mys pres");
+        });
 
 
         let down = new Layer('DOLNI_VRSTVA');

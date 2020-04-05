@@ -14,6 +14,10 @@ export class Component{
                                 dragAndDrop: //boolean zda umoznujeme drag and drop nebo ne
                         }
                 */
+
+                //komponent konektor slucuje vice jednoduchych komponent do sebe
+                //diky nemu muze probihat drag and drop nad nejakymi spojenymi komponenty, ktere tvori jiny spolecny objekt
+                this.componentConnector = null;
                 this.config = config;
                 this.layer;
         }
@@ -21,6 +25,16 @@ export class Component{
         //nastavi vrstvu komponenty
         _setLayer(layer){
                 this.layer = layer;
+        }
+
+        //nastavi komponent konektora
+        setConnector(connector){
+                this.componentConnector = connector;
+        }
+
+        //vrati komponent konektora
+        getConnector(){
+                return this.componentConnector;
         }
 
         //vrati vrstvu komponenty
