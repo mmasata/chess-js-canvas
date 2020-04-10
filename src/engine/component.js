@@ -112,4 +112,22 @@ export class Component{
                 }    
         }
 
+        onMouseDown(fc=null){
+                if(fc){
+                        Object.assign(this, {onMouseDown(){
+                                fc();
+                                }
+                        });   
+                }         
+        }
+
+        onMouseUp(fc=null){
+                if(fc){
+                        Object.assign(this, {onMouseUp(){
+                                fc();
+                                }
+                        });   
+                }     
+        }
+
 }

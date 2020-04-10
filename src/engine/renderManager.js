@@ -67,6 +67,7 @@ export class RenderManager{
                 canvas.addEventListener('mousedown', (e)=>{
                         let resultComponent = this._getMouseActiveComponent(e);
                         if(resultComponent && resultComponent.config.dragAndDrop){
+                                resultComponent.onMouseDown();
                                 this.draggingComponent = resultComponent;
                                 this.draggingStartX = e.clientX - canvas.getBoundingClientRect().left;
                                 this.draggingStartY = e.clientY - canvas.getBoundingClientRect().top;
@@ -75,6 +76,9 @@ export class RenderManager{
 
                 //naslouchac na odmacknuti tlacitka mysi... prenastavi promennou isDragging vsem komponentam na false
                 canvas.addEventListener('mouseup' , (e)=>{
+                        if(this.draggingComponent){
+                                this.draggingComponent.onMouseUp();
+                        }
                         this.draggingStartX = null;
                         this.draggingStartY = null;
                         this.draggingComponent = null;

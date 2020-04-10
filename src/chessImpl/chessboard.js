@@ -1,23 +1,28 @@
 import {Chesssquare} from './chesssquare.js';
 import {Pawn, Rook, Knight, Bishop, Queen, King} from './chessman.js';
+import {Layer} from '../engine/layer.js';
 
-export class Chessboard{
+export class Chessboard extends Layer{
 
-        constructor(game){
+        constructor(name, isStatic, game, players){
+                super(name, isStatic);
+                //hraci
+                this.players = players;
+                //hrac ktery je na rade
+                this.activePlayer = players[0];
+
+
                 this.game = game;
                 //zde budou ulozeny vsechny komponenty, tzn ctverce hraciho pole
                 this.border;
-                this.squares = [];
+                this.components = [];
                 this._initChessboard();
-        }
 
-        getSquares(){
-                return this.squares;
         }
-
+        //vrati vsechny figurky na sachovnici
         getChessmans(){
                 let chessmans = [];
-                for(let square of this.squares){
+                for(let square of this.components){
                         let chessman = square.getChessman();
                         if(chessman){
                                 chessmans.push(chessman);
@@ -26,6 +31,35 @@ export class Chessboard{
                 return chessmans;
         }
 
+        //vrati hraci pozici podle nazvu
+        getSquareByName(name){
+                for(let square of this.components){
+                        if(square.getConfig().name === name){
+                                return square;
+                        }
+                }
+                return null;
+        }
+
+        //zvyrazni square barvu
+        makeSquareMoveVisible(name){
+                for(let chesssquare of this.components){
+                        if(chesssquare.getConfig().name === name){
+                             chesssquare.getConfig().color = 'yellow';   
+                        }
+                }
+        }
+
+        //vrati zpet square barvu
+        makeSquareMoveHidden(name){
+                for(let chesssquare of this.components){
+                        if(chesssquare.getConfig().name === name){
+                             chesssquare.getConfig().color = chesssquare.getConfig().originColor;
+                        }
+                }
+        }
+
+        //inicializce sachovnice
         _initChessboard(){
                 //zalozi policka 8x8
                 const vertical = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -54,8 +88,8 @@ export class Chessboard{
                         currentY = startY;
                 }
                 //this._makeBorder(chessboardLength, startX, startY);
-                for(let letter of vertical){
-                        for(let number of horizontal){
+                for(let number of vertical){
+                        for(let letter of horizontal){
                                 const component = new Chesssquare({
                                         name : letter + number,
                                         x: currentX,
@@ -66,7 +100,7 @@ export class Chessboard{
                                         color: (color) ? 'rgb(181, 136, 99)' : 'rgb(240, 217, 181)',
                                         dragAndDrop: false
                                 })
-                                this.squares.push(component);
+                                this.components.push(component);
                                 let chessman =  this._createChessman(currentX, currentY, chessboardLength/8, letter+number);
                                 component.setChessman(chessman);
                                 color = !color;
@@ -80,89 +114,71 @@ export class Chessboard{
 
         }
 
+        //priradi figurku k danemu hraci
+        _addChessmanToPlayer(color, chessman){
+                if(color === 'white'){
+                        this.players[0].addChessman(chessman);
+                }
+                else{
+                        this.players[1].addChessman(chessman);
+                }
+        }
+
+        //inicializacni vytvoreni sachovych figurek s jejich defaultnim rozestavenim
         _createChessman(x,y, w, name){
+                let config = {
+                        x: x,
+                        y: y,
+                        w: w,
+                        h: w,
+                        object: 'image'
+                }
                 if(name.includes('2') || name.includes('7')){
-                        let color = (name.includes('7')) ? 'white' : 'black'
-                        let pawn = new Pawn({
-                                name : color + "_pawn",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('7')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('7')) ? true : false);
+                        config.name = config.color + "_pawn";
+                        let pawn = new Pawn(config , this);
+                        this._addChessmanToPlayer(config.color, pawn);
                         return pawn;
                 }
                 if((name.includes('A') || name.includes('H')) && (name.includes('1') || name.includes('8'))){
-                        let color = (name.includes('8')) ? 'white' : 'black'
-                        let rook = new Rook({
-                                name : color + "_rook",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('8')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('8')) ? true : false);
+                        config.name = config.color + "_rook";
+                        let rook = new Rook(config , this);
+                        this._addChessmanToPlayer(config.color, rook);
                         return rook;
                 }
                 if((name.includes('B') || name.includes('G')) && (name.includes('1') || name.includes('8'))){
-                        let color = (name.includes('8')) ? 'white' : 'black'
-                        let knight = new Knight({
-                                name : color + "_knight",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('8')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('8')) ? true : false);
+                        config.name = config.color + "_knight";
+                        let knight = new Knight(config , this);
+                        this._addChessmanToPlayer(config.color, knight);
                         return knight;
                 } 
                 if((name.includes('C') || name.includes('F')) && (name.includes('1') || name.includes('8'))){
-                        let color = (name.includes('8')) ? 'white' : 'black'
-                        let bishop = new Bishop({
-                                name : color + "_bishop",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('8')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('8')) ? true : false);
+                        config.name = config.color + "_bishop";
+                        let bishop = new Bishop(config , this);
+                        this._addChessmanToPlayer(config.color, bishop);
                         return bishop;
                 } 
                 if(name.includes('D') && (name.includes('1') || name.includes('8'))){
-                        let color = (name.includes('8')) ? 'white' : 'black'
-                        let queen = new Queen({
-                                name : color + "_queen",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('8')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('8')) ? true : false);
+                        config.name = config.color + "_queen";
+                        let queen = new Queen(config , this);
+                        this._addChessmanToPlayer(config.color, queen);
                         return queen;
                 }
                 if(name.includes('E') && (name.includes('1') || name.includes('8'))){
-                        let color = (name.includes('8')) ? 'white' : 'black'
-                        let king = new King({
-                                name : color + "_king",
-                                x: x,
-                                y: y,
-                                w: w,
-                                h: w,
-                                object: 'image',
-                                color: color,
-                                dragAndDrop: true
-                        });
+                        config.color = (name.includes('8')) ? 'white' : 'black';
+                        config.dragAndDrop = ((name.includes('8')) ? true : false);
+                        config.name = config.color + "_king";
+                        let king = new King(config , this);
+                        this._addChessmanToPlayer(config.color, king);
                         return king;
                 } 
         }

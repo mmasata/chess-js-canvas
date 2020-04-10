@@ -1,21 +1,24 @@
 import {Game} from './engine/game.js';
 import {Layer} from './engine/layer.js';
-import {King} from './chessImpl/chessman.js';
-import {ComponentConnector} from './engine/componentConnector.js';
 import { Chessboard } from './chessImpl/chessboard.js';
+import {Player} from './chessImpl/player.js';
 
 //Funkce init slouzi pro tvorbu hry
 const init = () => {
 
+        //pridani dvou hracu
+        let players = [
+                new Player("BOB"),
+                new Player("TOM")
+        ];
+
         //inicializace sachovnice
-        const chessboard = new Chessboard(game);
-        const chessboardLayer  = new Layer('Chessboard_layer', true);
-        chessboardLayer.addComponents(chessboard.getSquares());
-        game.setOffscreenLayer(chessboardLayer);
+        const chessboardLayer  = new Chessboard('Chessboard_layer', true, game, players);
+        game.addLayer(chessboardLayer);
 
 
         //inicializace figurek
-        let chessmans = chessboard.getChessmans();
+        let chessmans = chessboardLayer.getChessmans();
         const chessmanLayer = new Layer("Chessman_Layer" , false);
         chessmanLayer.addComponents(chessmans);
         game.addLayer(chessmanLayer);
