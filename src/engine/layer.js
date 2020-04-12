@@ -50,4 +50,15 @@ export class Layer {
                 }
                 //console.log('Komponenta k smazání "'+name+'" neexistuje');
         }
+
+        //odstrani komponentu z vrstvy
+        removeComponentObj(obj){
+                for(let i=0; i<this.components.length; i++){
+                        if(this.components[i] === obj){
+                                this.components.splice(i, 1);
+                                return;
+                        }
+                }
+                //console.log('Komponenta k smazání "'+name+'" neexistuje');
+        }
 }

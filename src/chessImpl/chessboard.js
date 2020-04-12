@@ -18,6 +18,11 @@ export class Chessboard extends Layer{
                 this.components = [];
                 this._initChessboard();
 
+
+                //inicializace druhe vnitrni vrstvy, kde mame figurky
+                this.chessmanLayer = new Layer("Chessman_Layer" , false);
+                this.chessmanLayer.addComponents(this.getChessmans());
+
         }
         //vrati vsechny figurky na sachovnici
         getChessmans(){
@@ -29,6 +34,27 @@ export class Chessboard extends Layer{
                         }
                 }
                 return chessmans;
+        }
+
+
+        //switch player
+        //po ukonceni tahu zmeni klikatelnost na druhou barvu
+        switchPlayer(){
+             //zmenime dragAndDrop aktualnimu hraci na false
+             for(let chessman of this.activePlayer.getChessmans()){
+                     chessman.getConfig().dragAndDrop = false;
+             }
+
+             for(let pl of this.players){
+                     if(pl != this.activePlayer){
+                             //zmenime dragandDrop novemu hraci na true
+                             for(let chessman of pl.getChessmans()){
+                                chessman.getConfig().dragAndDrop = true;
+                             }
+                             this.activePlayer = pl;
+                             return;
+                     }
+             }
         }
 
         //vrati hraci pozici podle nazvu

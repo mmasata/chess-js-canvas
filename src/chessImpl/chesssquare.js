@@ -18,4 +18,9 @@ export class Chesssquare extends Component{
         getChessman(){
                 return this.chessman;
         }
+
+
+        hasChessman(){
+                return (this.chessman != null);
+        }
 }

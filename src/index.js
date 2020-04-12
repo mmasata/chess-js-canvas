@@ -15,14 +15,7 @@ const init = () => {
         //inicializace sachovnice
         const chessboardLayer  = new Chessboard('Chessboard_layer', true, game, players);
         game.addLayer(chessboardLayer);
-
-
-        //inicializace figurek
-        let chessmans = chessboardLayer.getChessmans();
-        const chessmanLayer = new Layer("Chessman_Layer" , false);
-        chessmanLayer.addComponents(chessmans);
-        game.addLayer(chessmanLayer);
-        
+        game.addLayer(chessboardLayer.chessmanLayer);
 }
 
 

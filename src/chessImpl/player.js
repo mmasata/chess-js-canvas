@@ -20,4 +20,14 @@ export class Player {
         addChessman(chessman){
                 this.chessmans.push(chessman);
         }
+
+
+        removeChessman(chessman){
+                for(let i=0; i<this.chessmans.length; i++){
+                        if(this.chessmans[i] === chessman){
+                                this.components.splice(i, 1);
+                                return;
+                        }
+                }
+        }
 }
