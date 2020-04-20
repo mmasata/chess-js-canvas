@@ -227,7 +227,7 @@ export class Rook extends Chessman {
                 let positionNumber = Number(currentPosition.charAt(1));
 
                 let newLetter;
-                let newPosition;
+                let newNumber;
                 let condition;
                 let conditionVal;
                 switch(direction) {
@@ -236,7 +236,7 @@ export class Rook extends Chessman {
                                 condition = positionLetter;
                                 if(!(positionLetter === 'A')){
                                         newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)-1);
-                                        newPosition = positionNumber;
+                                        newNumber = positionNumber;
                                 }
                                 break;
                         case 'right':
@@ -244,7 +244,7 @@ export class Rook extends Chessman {
                                 condition = positionLetter;
                                 if(!(positionLetter === 'H')){
                                         newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)+1);
-                                        newPosition = positionNumber;
+                                        newNumber = positionNumber;
                                 }
                                 break;
                         case 'up':
@@ -252,7 +252,7 @@ export class Rook extends Chessman {
                                 condition = positionNumber;
                                 if(!(positionLetter === 8)){
                                         newLetter = positionLetter;
-                                        newPosition = positionNumber+1;
+                                        newNumber = positionNumber+1;
                                 }
                                 break;
                         case 'down':
@@ -260,7 +260,7 @@ export class Rook extends Chessman {
                                 condition = positionNumber;
                                 if(!(positionLetter === 1)){
                                         newLetter = positionLetter;
-                                        newPosition = positionNumber-1;
+                                        newNumber = positionNumber-1;
                                 }
                                 break;
                         default:
@@ -269,11 +269,11 @@ export class Rook extends Chessman {
                 if(condition === conditionVal){
                         return availableMoves;
                 }
-                let newSquare = this.layer.getSquareByName(newLetter+newPosition);
+                let newSquare = this.layer.getSquareByName(newLetter+newNumber);
                 //pokud nema chessmana, pak jdeme rekurzivne dal
                 if(!newSquare.hasChessman()){
-                        availableMoves.push(newLetter+newPosition);
-                        availableMoves = this._checkSquareRecursive(newLetter+newPosition, direction, availableMoves);
+                        availableMoves.push(newLetter+newNumber);
+                        availableMoves = this._checkSquareRecursive(newLetter+newNumber, direction, availableMoves);
                 }
                 //pokud ma chessmana naseho, pak koncime, bez pridani tohoto square do moznych
                 else if(newSquare.getChessman().getConfig().color == this.config.color){
@@ -281,7 +281,7 @@ export class Rook extends Chessman {
                 }
                 //pokud ma chessmana protihracovo, pak koncime a pridame tento square do moznych
                 else {
-                        availableMoves.push(newLetter+newPosition);
+                        availableMoves.push(newLetter+newNumber);
                         return availableMoves;
                 }
                 return availableMoves;
@@ -295,6 +295,14 @@ export class Knight extends Chessman {
                 super(config, layer, 'Knight');
                 (config.color === 'black') ? this._setFigureImage('knight_black') : this._setFigureImage('knight_white');
         }
+
+        
+        //vrati vsechny square name, na ktere muze figurka prejit
+        getPossibleMoves(){
+                //ma 8 moznosti [x+2, y+ (1,-1) ] , [x-2 , y+ (1,-1) ], [x+ (1,-1), y+2], [x+ (1,-1), y-2]
+                //pozn. neresi zda ma v ceste jine figurky, resi jen cilove pole
+                //TODO
+        }
 }
 
 //trida strelce
@@ -303,6 +311,87 @@ export class Bishop extends Chessman {
         constructor (config, layer) {
                 super(config, layer, 'Bishop');
                 (config.color === 'black') ? this._setFigureImage('bishop_black') : this._setFigureImage('bishop_white');
+        }
+
+        //vrati vsechny square name, na ktere muze figurka prejit
+        getPossibleMoves(){
+                let chessmanPosition = this.square.getConfig().name;
+                let availableMoves = [];
+                //ma 4 moznosti [x+1, y+1] , [x+1, y-1], [x-1, y+1] a [x-1, y-1]
+                let directions = ['leftUp' , 'rightUp' , 'leftDown' , 'rightDown'];
+                for(let direction of directions){
+                        let availableDirectionMoves = this._checkSquareRecursive(chessmanPosition, direction, []);
+                        availableMoves = availableMoves.concat(availableDirectionMoves);
+                }
+                return availableMoves;
+
+        }
+
+        //rekurzivni metoda pro pruchod vsemi smery
+        _checkSquareRecursive(currentPosition, direction, availableMoves){
+                let positionLetter = currentPosition.charAt(0);
+                let positionNumber = Number(currentPosition.charAt(1));
+
+                let newLetter;
+                let newNumber;
+                let conditionVal1;
+                let conditionVal2;
+                switch(direction) {
+                        case 'leftUp':
+                                conditionVal1 = 'A';
+                                conditionVal2 = 8;
+                                if(!((positionLetter === 'A') || (positionNumber === 8))){
+                                        console.log('ff');
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)-1);
+                                        newNumber =  positionNumber+1;
+                                }
+                                break;
+                        case 'rightUp':
+                                conditionVal1 = 'H';
+                                conditionVal2 = 8;
+                                if(!((positionLetter === 'H') || (positionNumber === 8))){
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)+1);
+                                        newNumber =  positionNumber+1;
+                                }
+                                break;
+                        case 'leftDown':
+                                conditionVal1 = 'A';
+                                conditionVal2 = 1;
+                                if(!((positionLetter === 'A') || (positionNumber === 1))){
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)-1);
+                                        newNumber =  positionNumber-1;
+                                }
+                                break;
+                        case 'rightDown':
+                                conditionVal1 = 'H';
+                                conditionVal2 = 1;
+                                if(!((positionLetter === 'H') || (positionNumber === 1))){
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)+1);
+                                        newNumber =  positionNumber-1;
+                                }
+                                break;
+                        default:
+                                return [];
+                }
+                if((positionLetter === conditionVal1) || (positionNumber === conditionVal2)){
+                        return availableMoves;
+                }
+                let newSquare = this.layer.getSquareByName(newLetter+newNumber);
+                //pokud nema chessmana, pak jdeme rekurzivne dal
+                if(!newSquare.hasChessman()){
+                        availableMoves.push(newLetter+newNumber);
+                        availableMoves = this._checkSquareRecursive(newLetter+newNumber, direction, availableMoves);
+                }
+                //pokud ma chessmana naseho, pak koncime, bez pridani tohoto square do moznych
+                else if(newSquare.getChessman().getConfig().color == this.config.color){
+                        return availableMoves;
+                }
+                //pokud ma chessmana protihracovo, pak koncime a pridame tento square do moznych
+                else {
+                        availableMoves.push(newLetter+newNumber);
+                        return availableMoves;
+                }
+                return availableMoves;
         }
 }
 
