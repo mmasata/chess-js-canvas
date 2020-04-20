@@ -78,7 +78,7 @@ export class Chessman extends Component {
                                 }
                         }
                         if(destinationSquare){
-                                //TODO pokud je zde protihracova figurka, pak ji sejme
+                                //pokud je zde protihracova figurka, pak ji sejme
                                 if(destinationSquare.getChessman() != null){
                                         this.destroyEnemyChessman(destinationSquare);
                                 }
@@ -106,7 +106,6 @@ export class Chessman extends Component {
 
                 //musime rict i chessSquare, ze tam je
                 square.setChessman(this);
-
         }
 
 
@@ -203,6 +202,89 @@ export class Rook extends Chessman {
         constructor (config, layer) {
                 super(config, layer, 'Rook');
                 (config.color === 'black') ? this._setFigureImage('rook_black') : this._setFigureImage('rook_white');
+        }
+
+        //vrati vsechny square name, na ktere muze figurka prejit
+        getPossibleMoves(){
+                //vez muze hrat kdyz je na [x,y], pak muze jit [x, 1-8] nebo [A-H, y] , pokud nema v ceste figurku
+                //zkontrolovat zda neni na A,H,1 nebo 8, abychom mohli vyloucit smery
+                let chessmanPosition = this.square.getConfig().name;
+                let availableMoves = [];
+                let directions = ['left' , 'right' , 'up' , 'down'];
+                for(let direction of directions){
+                        let availableDirectionMoves = this._checkSquareRecursive(chessmanPosition, direction, []);
+                        availableMoves = availableMoves.concat(availableDirectionMoves);
+                }
+                return availableMoves;
+        }
+
+        _checkSquareRecursive(currentPosition, direction, availableMoves){
+                //dostane aktualni square, zjisti zda muze na nej prejit
+                //pokud ano, vola rekurzivne znovu, ale zmeni pozici za parametru direction, ktery definuje smer
+                //left-right meni pismeno
+                //up-down meni cislo
+                let positionLetter = currentPosition.charAt(0);
+                let positionNumber = Number(currentPosition.charAt(1));
+
+                let newLetter;
+                let newPosition;
+                let condition;
+                let conditionVal;
+                switch(direction) {
+                        case 'left':
+                                conditionVal = 'A';
+                                condition = positionLetter;
+                                if(!(positionLetter === 'A')){
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)-1);
+                                        newPosition = positionNumber;
+                                }
+                                break;
+                        case 'right':
+                                conditionVal = 'H';
+                                condition = positionLetter;
+                                if(!(positionLetter === 'H')){
+                                        newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)+1);
+                                        newPosition = positionNumber;
+                                }
+                                break;
+                        case 'up':
+                                conditionVal = 8;
+                                condition = positionNumber;
+                                if(!(positionLetter === 8)){
+                                        newLetter = positionLetter;
+                                        newPosition = positionNumber+1;
+                                }
+                                break;
+                        case 'down':
+                                conditionVal = 1;
+                                condition = positionNumber;
+                                if(!(positionLetter === 1)){
+                                        newLetter = positionLetter;
+                                        newPosition = positionNumber-1;
+                                }
+                                break;
+                        default:
+                                return [];
+                }
+                if(condition === conditionVal){
+                        return availableMoves;
+                }
+                let newSquare = this.layer.getSquareByName(newLetter+newPosition);
+                //pokud nema chessmana, pak jdeme rekurzivne dal
+                if(!newSquare.hasChessman()){
+                        availableMoves.push(newLetter+newPosition);
+                        availableMoves = this._checkSquareRecursive(newLetter+newPosition, direction, availableMoves);
+                }
+                //pokud ma chessmana naseho, pak koncime, bez pridani tohoto square do moznych
+                else if(newSquare.getChessman().getConfig().color == this.config.color){
+                        return availableMoves;
+                }
+                //pokud ma chessmana protihracovo, pak koncime a pridame tento square do moznych
+                else {
+                        availableMoves.push(newLetter+newPosition);
+                        return availableMoves;
+                }
+                return availableMoves;
         }
 }
 
