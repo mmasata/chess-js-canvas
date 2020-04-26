@@ -299,9 +299,31 @@ export class Knight extends Chessman {
         
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
+                let availableMoves = [];
                 //ma 8 moznosti [x+2, y+ (1,-1) ] , [x-2 , y+ (1,-1) ], [x+ (1,-1), y+2], [x+ (1,-1), y-2]
                 //pozn. neresi zda ma v ceste jine figurky, resi jen cilove pole
-                //TODO
+                let chessmanPosition = this.square.getConfig().name;
+                let positionLetter = chessmanPosition.charAt(0);
+                let positionNumber = Number(chessmanPosition.charAt(1));
+                let moves = [
+                        {x: 2 , y: 1}, {x: 2 , y: -1}, 
+                        {x: -2 , y: 1}, {x: -2 , y: -1},
+                        {x: 1, y:2} , {x: -1, y:2},
+                        {x: 1, y:-2} , {x: -1, y:-2},
+                ]
+                for(let move of moves){
+                        let numberOfLetter = this.getNumberFromLetter(positionLetter) + move.x;
+                        let number = positionNumber + move.y;
+
+                        //zjistit zda na danem poli neni moje figurka
+                        if((numberOfLetter <= 8 && numberOfLetter >= 1) && (number <= 8 && number >= 1)){
+                                let newSquare = this.layer.getSquareByName(this.getLetterFromNumber(numberOfLetter)+number);
+                                if(!(newSquare.hasChessman() === true && newSquare.getChessman().config.color === this.config.color)){
+                                        availableMoves.push(this.getLetterFromNumber(numberOfLetter)+number);
+                                }
+                        }
+                }
+                return availableMoves;
         }
 }
 
