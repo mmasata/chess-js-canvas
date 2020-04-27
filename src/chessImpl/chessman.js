@@ -206,9 +206,14 @@ export class Rook extends Chessman {
 
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
+                let chessmanPosition = this.square.getConfig().name;
+                return this.getRookMoves(chessmanPosition);
+        }
+
+
+        getRookMoves(chessmanPosition){
                 //vez muze hrat kdyz je na [x,y], pak muze jit [x, 1-8] nebo [A-H, y] , pokud nema v ceste figurku
                 //zkontrolovat zda neni na A,H,1 nebo 8, abychom mohli vyloucit smery
-                let chessmanPosition = this.square.getConfig().name;
                 let availableMoves = [];
                 let directions = ['left' , 'right' , 'up' , 'down'];
                 for(let direction of directions){
@@ -338,6 +343,10 @@ export class Bishop extends Chessman {
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
+                return this.getBishopMoves(chessmanPosition);
+        }
+
+        getBishopMoves(chessmanPosition){
                 let availableMoves = [];
                 //ma 4 moznosti [x+1, y+1] , [x+1, y-1], [x-1, y+1] a [x-1, y-1]
                 let directions = ['leftUp' , 'rightUp' , 'leftDown' , 'rightDown'];
@@ -363,7 +372,6 @@ export class Bishop extends Chessman {
                                 conditionVal1 = 'A';
                                 conditionVal2 = 8;
                                 if(!((positionLetter === 'A') || (positionNumber === 8))){
-                                        console.log('ff');
                                         newLetter = this.getLetterFromNumber(this.getNumberFromLetter(positionLetter)-1);
                                         newNumber =  positionNumber+1;
                                 }
@@ -423,6 +431,23 @@ export class Queen extends Chessman {
         constructor (config, layer) {
                 super(config, layer, 'Queen');
                 (config.color === 'black') ? this._setFigureImage('queen_black') : this._setFigureImage('queen_white');
+
+
+                let newConfig = {color: config.color};
+                this.bishop = new Bishop(newConfig, layer);
+                this.rook = new Rook(newConfig, layer);
+        }
+
+
+        getPossibleMoves(){
+                let chessmanPosition = this.square.getConfig().name;
+                let availableMoves = [];
+                let rookMoves = this.rook.getRookMoves(chessmanPosition);
+                let bishopMoves = this.bishop.getBishopMoves(chessmanPosition);
+
+                availableMoves = availableMoves.concat(rookMoves);
+                availableMoves = availableMoves.concat(bishopMoves);
+                return availableMoves;
         }
 }
 
