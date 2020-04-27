@@ -1,5 +1,4 @@
 import {Game} from './engine/game.js';
-import {Layer} from './engine/layer.js';
 import { Chessboard } from './chessImpl/chessboard.js';
 import {Player} from './chessImpl/player.js';
 

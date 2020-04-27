@@ -22,7 +22,6 @@ export class Chessboard extends Layer{
                 //inicializace druhe vnitrni vrstvy, kde mame figurky
                 this.chessmanLayer = new Layer("Chessman_Layer" , false);
                 this.chessmanLayer.addComponents(this.getChessmans());
-
         }
         //vrati vsechny figurky na sachovnici
         getChessmans(){

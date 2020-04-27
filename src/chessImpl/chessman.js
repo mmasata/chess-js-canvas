@@ -1,6 +1,7 @@
 //trida figurky, ze ktere budou dedit vsechny druhu figurek
 //jednotlivi potomci budou mit jina pravidla pohybu
 import {Component} from '../engine/component.js';
+import { ChessmanModalChooser } from './chessmanModalChooser.js';
 
 export class Chessman extends Component {
 
@@ -85,6 +86,12 @@ export class Chessman extends Component {
 
                                 this.moveChessman(destinationSquare);
 
+
+                                if(this.type === 'Pawn' && (destinationSquare.getName().includes('1') || destinationSquare.getName().includes('8')) ){
+                                       ChessmanModalChooser.showModal(this);
+                                }
+
+
                                 //ukonci tah hrace
                                 this.endPlayerMove();
                         }
@@ -135,10 +142,56 @@ export class Pawn extends Chessman {
         constructor (config, layer) {
                 super(config, layer, 'Pawn');
                 (config.color === 'black') ? this._setFigureImage('pawn_black') : this._setFigureImage('pawn_white');
+
+
+                let newConfig = {color: config.color};
+                this.queen = new Queen(newConfig, layer);
+                this.knight = new Knight(newConfig, layer);
+                this.rook = new Rook(newConfig, layer);
+                this.bishop = new Bishop(newConfig, layer);
+
+                this.newType = null;
+        }
+
+
+        //zmeni typ
+        becameNewType(type){
+                this._setFigureImage(type.toLowerCase()+'_'+this.config.color);
+                this.newType = type;
+                this.type = type;
         }
 
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
+                if(this.newType == null){
+                        return this.getPawnMoves();
+                }
+                else {
+                        let availableMoves = [];
+                        let chessmanPosition = this.square.getConfig().name;
+                        switch(this.newType){
+                                case 'Rook':
+                                        availableMoves = this.rook.getRookMoves(chessmanPosition);
+                                        break;
+                                case 'Bishop':
+                                        availableMoves = this.bishop.getBishopMoves(chessmanPosition);
+                                        break;
+                                case 'Queen':
+                                        availableMoves = this.queen.getQueenMoves(chessmanPosition);
+                                        break;
+                                case 'Knight':
+                                        availableMoves = this.knight.getKnightMoves(chessmanPosition);
+                                        break;
+                                default:
+                                        availableMoves = [];
+                                        break;
+                        }
+                        return availableMoves;
+                }
+        }
+
+
+        getPawnMoves(){
                 let availableMoves = [];
                 let chessmanPosition = this.square.getConfig().name;
                 let positionLetter = chessmanPosition.charAt(0);
@@ -167,8 +220,7 @@ export class Pawn extends Chessman {
                         }
                 }
                 else {
-                //kdyz je na 1 nebo 8 muze menit za jinou figurku
-                //TODO
+                //kdyz je na 1-8 tak je jiz jina figurka
                 }
 
                 //když je protihráč na [písmeno-1;číslo-1] nebo [písmeno+1;číslo-1] (u bile)
@@ -304,10 +356,14 @@ export class Knight extends Chessman {
         
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
+                let chessmanPosition = this.square.getConfig().name;
+                return this.getKnightMoves(chessmanPosition);
+        }
+
+        getKnightMoves(chessmanPosition){
                 let availableMoves = [];
                 //ma 8 moznosti [x+2, y+ (1,-1) ] , [x-2 , y+ (1,-1) ], [x+ (1,-1), y+2], [x+ (1,-1), y-2]
                 //pozn. neresi zda ma v ceste jine figurky, resi jen cilove pole
-                let chessmanPosition = this.square.getConfig().name;
                 let positionLetter = chessmanPosition.charAt(0);
                 let positionNumber = Number(chessmanPosition.charAt(1));
                 let moves = [
@@ -441,6 +497,10 @@ export class Queen extends Chessman {
 
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
+                return this.getQueenMoves(chessmanPosition);
+        }
+
+        getQueenMoves(chessmanPosition){
                 let availableMoves = [];
                 let rookMoves = this.rook.getRookMoves(chessmanPosition);
                 let bishopMoves = this.bishop.getBishopMoves(chessmanPosition);
