@@ -21,8 +21,8 @@ const init = () => {
 //v pripade ze je width a height hodnota full, pak bude na celou stranku a bude se automaticky menit velikost pri zmene velikosti obrazovky
 //jdou take nastavit cisla vyjadrujici pixely
 const gameConfig = {
-        width: 'full',
-        height: 'full',
+        width: '1000',
+        height: '1000',
         canvas: 'game'
 }
 const game = new Game(gameConfig);

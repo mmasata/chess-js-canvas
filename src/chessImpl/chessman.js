@@ -118,7 +118,22 @@ export class Chessman extends Component {
 
         //ukonci tah hrace
         endPlayerMove(){
-                this.layer.switchPlayer();
+                //zepta se zda jsem dal protihraci sach
+                let isCheck = this.isCheck();
+                this.layer.switchPlayer(isCheck);
+        }
+
+        //vraci boolean zda dalsi tah zasahuje na krale
+        isCheck(){
+                let moves = this.getPossibleMoves();
+                for(let move of moves){
+                        let square = this.layer.getSquareByName(move);
+                        let chessman = square.getChessman();
+                        if((chessman != null) && chessman.type === 'King'){
+                                return true;
+                        }
+                }
+                return false;
         }
 
         //znici protihracovu figurku
@@ -130,7 +145,7 @@ export class Chessman extends Component {
                 square.setChessman(null);
 
                 //odstrani ji z listu hrace
-                //TODO
+                this.player.removeChessman(this);
         }
 
 
@@ -517,5 +532,25 @@ export class King extends Chessman {
         constructor (config, layer) {
                 super(config, layer, 'King');
                 (this.config.color === 'black') ? this._setFigureImage('king_black') : this._setFigureImage('king_white');
+        }
+
+
+        getPossibleMoves(){
+                let availableMoves = [];
+                let moves = [
+                        {x: -1 , y: -1}, {x: -1 , y: 0} , {x: -1 , y: 1},
+                        {x: 0 , y: -1} , /* aktualni pozice ,*/ {x: 0 , y: 1},
+                        {x: 1 , y: -1}, {x: 1 , y: 0} , {x: 1 , y: 1}
+                ];
+                let chessmanPosition = this.square.getConfig().name;
+                let positionLetter = chessmanPosition.charAt(0);
+                let positionNumber = Number(chessmanPosition.charAt(1));
+                for(let move of moves){
+                        if(  (((positionLetter+move.x) > 0) && ((positionLetter+move.x) < 9)) &&   (((positionNumber+move.y) > 0) && ((positionNumber+move.y) < 9))){
+                                //TODO zeptam se zda je tam moje figurka
+                                //TODO zeptam se zda me tato pozice neudela sach
+                        }
+                }
+                return availableMoves;
         }
 }

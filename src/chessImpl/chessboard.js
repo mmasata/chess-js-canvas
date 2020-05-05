@@ -38,7 +38,7 @@ export class Chessboard extends Layer{
 
         //switch player
         //po ukonceni tahu zmeni klikatelnost na druhou barvu
-        switchPlayer(){
+        switchPlayer(isCheck){
              //zmenime dragAndDrop aktualnimu hraci na false
              for(let chessman of this.activePlayer.getChessmans()){
                      chessman.getConfig().dragAndDrop = false;
@@ -51,9 +51,30 @@ export class Chessboard extends Layer{
                                 chessman.getConfig().dragAndDrop = true;
                              }
                              this.activePlayer = pl;
+                             this.activePlayer.setCheck(isCheck);
+                             if(isCheck){
+                                     this._isCheckmate();
+                                     //TODO if true, pak zavolat endGame()
+                             }
                              return;
                      }
              }
+        }
+
+
+        //kontrola zda neni mat
+        _isCheckmate(){
+                //TODO
+                //TODO vezme vsechny figurky hrace a u kazde zkusi nasimulovat tah.. pote se zepta zda je furt sach... pokud je alespon jeden zpusob jak ukoncit sach, pak neni mat
+                let color = (this.activePlayer === this.players[0]) ? 'white' : 'black';
+                console.log(color + ' dostal šach');
+                console.log('je to mat?????')
+        }
+
+
+        //metoda ukoncujici hru
+        _endGame(){
+                //TODO
         }
 
         //vrati hraci pozici podle nazvu
@@ -70,7 +91,7 @@ export class Chessboard extends Layer{
         makeSquareMoveVisible(name){
                 for(let chesssquare of this.components){
                         if(chesssquare.getConfig().name === name){
-                             chesssquare.getConfig().color = 'yellow';   
+                             chesssquare.getConfig().color = 'yellow';
                         }
                 }
         }
@@ -143,9 +164,11 @@ export class Chessboard extends Layer{
         _addChessmanToPlayer(color, chessman){
                 if(color === 'white'){
                         this.players[0].addChessman(chessman);
+                        chessman.player = this.players[0];
                 }
                 else{
                         this.players[1].addChessman(chessman);
+                        chessman.player = this.players[1];
                 }
         }
 
