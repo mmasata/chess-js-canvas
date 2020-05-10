@@ -31,3 +31,11 @@ document.getElementById("init").addEventListener('click' , ()=>{
         document.getElementById("modal").style.display = "none";
         init();    
 });
+document.addEventListener('keydown', (evt)=>{
+        evt = evt || window.event;
+        if (evt.keyCode == 27) {
+                let menu = document.getElementById("mainMenu");
+                let menuVisibility = menu.style.display;
+                menu.style.display = (menuVisibility === 'none') ? 'block' : 'none';
+        }
+});

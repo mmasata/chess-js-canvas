@@ -63,6 +63,7 @@ export class Chessman extends Component {
                 }
         }
 
+
         onMouseUp(){
                 if(this.moves){
                         for(let move of this.moves){
@@ -141,11 +142,11 @@ export class Chessman extends Component {
                 //odstrani ji z chessman vrstvy
                 this.layer.chessmanLayer.removeComponentObj(square.getChessman());
 
+                //odstrani ji z listu hrace
+                square.getChessman().player.removeChessman(square.getChessman());
+
                 //odstrani ji ze square
                 square.setChessman(null);
-
-                //odstrani ji z listu hrace
-                this.player.removeChessman(this);
         }
 
 
@@ -543,11 +544,21 @@ export class King extends Chessman {
                         {x: 1 , y: -1}, {x: 1 , y: 0} , {x: 1 , y: 1}
                 ];
                 let chessmanPosition = this.square.getConfig().name;
-                let positionLetter = chessmanPosition.charAt(0);
+                let positionLetterNumber = this.getNumberFromLetter(chessmanPosition.charAt(0));
                 let positionNumber = Number(chessmanPosition.charAt(1));
                 for(let move of moves){
-                        if(  (((positionLetter+move.x) > 0) && ((positionLetter+move.x) < 9)) &&   (((positionNumber+move.y) > 0) && ((positionNumber+move.y) < 9))){
-                                //TODO zeptam se zda je tam moje figurka
+                        if(  (((positionLetterNumber+move.x) > 0) && ((positionLetterNumber+move.x) < 9)) &&   (((positionNumber+move.y) > 0) && ((positionNumber+move.y) < 9))){
+                                let newLetter = this.getLetterFromNumber(positionLetterNumber+move.x);
+                                let newNumber = positionNumber+move.y;
+                                let newSquare = this.layer.getSquareByName(newLetter+newNumber);
+                                if(!newSquare.hasChessman()){
+                                        availableMoves.push(newLetter +newNumber);
+                                }
+                                else {
+                                     if( newSquare.getChessman().getConfig().color != this.config.color ){
+                                             availableMoves.push(newLetter+newNumber);
+                                     }
+                                }
                                 //TODO zeptam se zda me tato pozice neudela sach
                         }
                 }

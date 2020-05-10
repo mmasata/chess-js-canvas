@@ -38,4 +38,12 @@ export class Player {
                         }
                 }
         }
+
+
+
+        //tato metoda vrati vsechna pole kam dany hrac muze zahrat i dalsi kolo
+        //bude slouzit pro definovani sachu/matu, ci moznosti hrace zahrat nejaky tah
+        getAllNextMoves(){
+                //TODO
+        }
 }
