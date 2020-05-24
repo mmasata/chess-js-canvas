@@ -119,9 +119,13 @@ export class Chessman extends Component {
 
         //ukonci tah hrace
         endPlayerMove(){
+                if(this.player.check){
+                        //jestlize mel sach, tak ted uz ho mit nemuze.. kdyby byl mat tak by se hra ukoncila
+                        this.player.check = !this.player.check;
+                }
                 //zepta se zda jsem dal protihraci sach
                 let isCheck = this.isCheck();
-                this.layer.switchPlayer(isCheck);
+                this.layer.switchPlayer(isCheck, this);
         }
 
         //vraci boolean zda dalsi tah zasahuje na krale
@@ -242,23 +246,35 @@ export class Pawn extends Chessman {
                 //když je protihráč na [písmeno-1;číslo-1] nebo [písmeno+1;číslo-1] (u bile)
                 // kdyz je prottihrac na [písmeno-1;číslo+1] nebo [písmeno+1;číslo+1] (u cerne)
                 let letterNumber = this.getNumberFromLetter(positionLetter);
-                if(letterNumber>1){
-                        let letter = this.getLetterFromNumber(letterNumber-1);
-                        //checkni jestli je nalevo nad protihrac
-                        if(this.layer.getSquareByName(letter+conditionStartOneStep).hasChessman()){
-                                if(this.layer.getSquareByName(letter+conditionStartOneStep).getChessman().getConfig().color != this.config.color){
-                                        availableMoves.push(letter+conditionStartOneStep);
+                if(conditionStartOneStep > 0 && conditionStartOneStep < 9){
+                        if(letterNumber>1){
+                                let letter = this.getLetterFromNumber(letterNumber-1);
+                                //checkni jestli je nalevo nad protihrac
+                                if(this.layer.getSquareByName(letter+conditionStartOneStep).hasChessman()){
+                                        if(this.layer.getSquareByName(letter+conditionStartOneStep).getChessman().getConfig().color != this.config.color){
+                                                availableMoves.push(letter+conditionStartOneStep);
+                                        }
+                                }
+                        }
+                        if(letterNumber<8){
+                                let letter = this.getLetterFromNumber(letterNumber+1);
+                                //checkni jestli je napravo nad protihrac
+                                if(this.layer.getSquareByName(letter+conditionStartOneStep).hasChessman()){
+                                        if(this.layer.getSquareByName(letter+conditionStartOneStep).getChessman().getConfig().color != this.config.color){
+                                                availableMoves.push(letter+conditionStartOneStep);
+                                        }
                                 }
                         }
                 }
-                if(letterNumber<8){
-                        let letter = this.getLetterFromNumber(letterNumber+1);
-                        //checkni jestli je napravo nad protihrac
-                        if(this.layer.getSquareByName(letter+conditionStartOneStep).hasChessman()){
-                                if(this.layer.getSquareByName(letter+conditionStartOneStep).getChessman().getConfig().color != this.config.color){
-                                        availableMoves.push(letter+conditionStartOneStep);
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
                                 }
                         }
+                        return checkResult;
                 }
                 return availableMoves;
         }
@@ -275,7 +291,18 @@ export class Rook extends Chessman {
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
-                return this.getRookMoves(chessmanPosition);
+                let availableMoves = this.getRookMoves(chessmanPosition);
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
+                }
+                return availableMoves;
         }
 
 
@@ -400,6 +427,16 @@ export class Knight extends Chessman {
                                 }
                         }
                 }
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
+                }
                 return availableMoves;
         }
 }
@@ -415,7 +452,18 @@ export class Bishop extends Chessman {
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
-                return this.getBishopMoves(chessmanPosition);
+                let availableMoves = this.getBishopMoves(chessmanPosition);
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
+                }
+                return availableMoves;
         }
 
         getBishopMoves(chessmanPosition){
@@ -523,6 +571,16 @@ export class Queen extends Chessman {
 
                 availableMoves = availableMoves.concat(rookMoves);
                 availableMoves = availableMoves.concat(bishopMoves);
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
+                }
                 return availableMoves;
         }
 }
@@ -561,6 +619,16 @@ export class King extends Chessman {
                                 }
                                 //TODO zeptam se zda me tato pozice neudela sach
                         }
+                }
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.king;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
                 }
                 return availableMoves;
         }

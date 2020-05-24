@@ -38,7 +38,7 @@ export class Chessboard extends Layer{
 
         //switch player
         //po ukonceni tahu zmeni klikatelnost na druhou barvu
-        switchPlayer(isCheck){
+        switchPlayer(isCheck, attackChessman){
              //zmenime dragAndDrop aktualnimu hraci na false
              for(let chessman of this.activePlayer.getChessmans()){
                      chessman.getConfig().dragAndDrop = false;
@@ -51,10 +51,10 @@ export class Chessboard extends Layer{
                                 chessman.getConfig().dragAndDrop = true;
                              }
                              this.activePlayer = pl;
-                             this.activePlayer.setCheck(isCheck);
                              if(isCheck){
-                                     this._isCheckmate();
-                                     //TODO if true, pak zavolat endGame()
+                                     if(this._isCheckmate(attackChessman)){
+                                        console.log('sach mat, konecna');
+                                     }
                              }
                              return;
                      }
@@ -63,12 +63,119 @@ export class Chessboard extends Layer{
 
 
         //kontrola zda neni mat
-        _isCheckmate(){
-                //TODO
-                //TODO vezme vsechny figurky hrace a u kazde zkusi nasimulovat tah.. pote se zepta zda je furt sach... pokud je alespon jeden zpusob jak ukoncit sach, pak neni mat
-                let color = (this.activePlayer === this.players[0]) ? 'white' : 'black';
-                console.log(color + ' dostal šach');
-                console.log('je to mat?????')
+        _isCheckmate(attackChessman){
+                let playerInDefense;
+                let playerInAttack;
+                if(this.activePlayer === this.players[0]){
+                        playerInDefense = this.players[0];
+                        playerInAttack = this.players[1];  
+                }
+                else {
+                        playerInDefense = this.players[1];
+                        playerInAttack = this.players[0];     
+                }
+                
+                //u all next Moves musime zjistit,  zda kral v defenzive muze zahrat na nejake pole
+                let attackerNextMoves = playerInAttack.getAllNextMoves();
+                let defenseKingMoves = playerInDefense.getKing().getPossibleMoves();
+                let possibleKingMoves = [];
+                for(let kingMove of defenseKingMoves){
+                        if(!attackerNextMoves.includes(kingMove)){
+                                //to znamena ze to kral muze zehrat -> tedy neni mat
+                                possibleKingMoves.push(kingMove);
+                        }
+                }
+
+                let allDefensePlayerMoves = playerInDefense.getAllNextMovesExceptKing();
+                let possibleDefenseMoves = [];
+                //lze zablokovat v pripade veze, strelce, a damy
+                let attackChessmanPos= attackChessman.square.getConfig().name;
+                let kingPos = playerInDefense.getKing().square.getConfig().name;
+                if(attackChessman.type === 'Bishop' || attackChessman.type === 'Queen' || attackChessman.type === 'Rook'){
+                        //kdyz jde o vertikalni horizontalni - stejna X nebo Y souradnice (vez nebo dama)
+                        if(attackChessmanPos.charAt(0) === kingPos.charAt(0)){
+                                //pismeno je stejne, a cislo bude neco mezi nimi, ci pozice utocnika
+                                let posBetweenNumbers = this._generateAllNumbersBetween(attackChessmanPos.charAt(1),kingPos.charAt(1));
+                                let positionsToBlock = [];
+                                for(let l of posBetweenNumbers){
+                                        positionsToBlock.push(attackChessmanPos.charAt(0) + l);
+                                }
+                                positionsToBlock.push(attackChessmanPos);
+                                for(let posBlock of positionsToBlock){
+                                        if(allDefensePlayerMoves.includes(posBlock)){
+                                                possibleDefenseMoves.push(posBlock);
+                                        }
+                                }
+                        }
+                        // taky vez nebo dama
+                        else if(attackChessmanPos.charAt(1) === kingPos.charAt(1)){
+                                //cislo je stejne a pismeno bude neco mezi danymi dvema, ci pozice utocnika
+                                let posBetweenNumbers = this._generateAllNumbersBetween(attackChessman.getNumberFromLetter(attackChessmanPos.charAt(0)), playerInDefense.getKing().getNumberFromLetter(kingPos.charAt(0)));
+                                let positionsToBlock = [];
+                                for(let l of posBetweenNumbers){
+                                        positionsToBlock.push(attackChessman.getLetterFromNumber(l) + attackChessmanPos.charAt(1));
+                                }
+                                positionsToBlock.push(attackChessmanPos);
+                                for(let posBlock of positionsToBlock){
+                                        if(allDefensePlayerMoves.includes(posBlock)){
+                                                possibleDefenseMoves.push(posBlock);
+                                        }
+                                }
+                        }
+                        //kdyz jde o jinou X i Y souradnici - (strelec nebo dama)
+                        else {
+                                let posNumberBetween = this._generateAllNumbersBetween(attackChessmanPos.charAt(1),kingPos.charAt(1));
+                                let posLetterBetween = this._generateAllNumbersBetween(attackChessman.getNumberFromLetter(attackChessmanPos.charAt(0)), playerInDefense.getKing().getNumberFromLetter(kingPos.charAt(0)));
+                                let positionsToBlock = [];
+
+                                let attackerLetterNumber = attackChessman.getNumberFromLetter(attackChessmanPos.charAt(0));
+                                let attackerNumber = Number(attackChessmanPos.charAt(1));
+                                let defenderLetterNumber = playerInDefense.getKing().getNumberFromLetter(kingPos.charAt(0));
+                                let deffenderNumber = Number(kingPos.charAt(1));
+                                for(let l=0; l < posNumberBetween.length; l++){
+                                        if(  ((attackerLetterNumber > defenderLetterNumber) && (attackerNumber>deffenderNumber)) || ((attackerLetterNumber < defenderLetterNumber) && (attackerNumber<deffenderNumber))  ){
+                                                //spojime
+                                                positionsToBlock.push(attackChessman.getLetterFromNumber(posLetterBetween[l])+posNumberBetween[l]);
+                                        }
+                                        else{
+                                                //number musime odkonce pridavat
+                                                positionsToBlock.push(attackChessman.getLetterFromNumber(posLetterBetween[l])+posNumberBetween[posNumberBetween.length-1-l]);
+                                        }
+                                }
+                                positionsToBlock.push(attackChessmanPos);
+                                for(let posBlock of positionsToBlock){
+                                        if(allDefensePlayerMoves.includes(posBlock)){
+                                                possibleDefenseMoves.push(posBlock);
+                                        }
+                                }
+                        }
+                }
+                else {
+                        //pesak nebo kun -> pujde to jen zpusobem ze znicime figurku
+                        if(allDefensePlayerMoves.includes(attackChessmanPos)){
+                                possibleDefenseMoves.push(attackChessmanPos);
+                        }
+                }
+
+                let checkBlockData = {
+                        "king" : possibleKingMoves,
+                        "others" : possibleDefenseMoves
+                }
+                playerInDefense.setCheck(true);
+                playerInDefense.checkBlockData = checkBlockData;
+                return ( (possibleKingMoves.length ===0) && (possibleDefenseMoves.length ===0) ) ? true : false;
+        }
+
+        //metoda pro generovani cisel, abychom dostali spravne pozice na blok sachu
+        _generateAllNumbersBetween(first, second){
+                let resultNumbers = [];
+                let val = Math.abs(Number(first)-Number(second)) -1;
+                let smallestNumber = (Number(first) > Number(second)) ? Number(second) : Number(first);
+                for(let i=0; i < val; i++){
+                        smallestNumber++;
+                        resultNumbers.push(smallestNumber);
+                }
+                return resultNumbers;
         }
 
 

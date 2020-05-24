@@ -39,11 +39,36 @@ export class Player {
                 }
         }
 
+        getKing(){
+               for(let ch of this.getChessmans()){
+                       if(ch.type === 'King'){
+                               return ch;
+                       }
+               } 
+               return null;
+        }
 
+        getAllNextMovesExceptKing(){
+                let allMoves = []
+                for(let ch of this.getChessmans()){
+                        if(ch.type != 'King'){
+                                allMoves = allMoves.concat(ch.getPossibleMoves());
+                        }
+                }
+                //mame vsechny tahy figurek, nyni musime nechat jen ty unikatni
+                let uniqueArr = new Set(allMoves);
+                return [...uniqueArr];     
+        }
 
         //tato metoda vrati vsechna pole kam dany hrac muze zahrat i dalsi kolo
         //bude slouzit pro definovani sachu/matu, ci moznosti hrace zahrat nejaky tah
         getAllNextMoves(){
-                //TODO
+                let allMoves = []
+                for(let ch of this.getChessmans()){
+                        allMoves = allMoves.concat(ch.getPossibleMoves());
+                }
+                //mame vsechny tahy figurek, nyni musime nechat jen ty unikatni
+                let uniqueArr = new Set(allMoves);
+                return [...uniqueArr];
         }
 }
