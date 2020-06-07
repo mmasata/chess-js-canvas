@@ -36,3 +36,20 @@ To se může hodit při akcích na komponenty, jako například při kliknutí, 
 Nemusíme opisovat stejnou část kódu vícekrát pro tu samou činnost.
 #### Render Manager
 Zde se děje veškerá logika vykreslování v Canvasu. Refreshování snímků a akcí.
+### Implementace šachů
+#### Figurky
+Jsou potomci komponenty, a jejich abstráktní třída je Chessman, s univerzálními společnými vlastnostmi.
+Poté jsou implementovány již konkrétní typy, třída Pěšáka, věže, střelce, atd...
+Ty dědí z Chessmana a ten z komponenty, proto jsou taky komponentou.
+Mají na sebe evidované nějaké herní pole (nějaká instance třídy) a hráče.
+#### Hráč
+Hráč si pouze eviduje, zda je na tahu nebo ne, jaké má figurky a zda je v šachu.
+#### Hrací pole
+Je třída, která si eviduje svoje jméno (souřadnicovou pozici, např. "F2") a figurku, která je na ní (pokud nějaká v daný moment je).
+#### Šachovnice
+Jedná se o třídu Chessboard.
+Ta řeší mimo jiné i na začátku hry inicizalizaci všech figurek a přiřazení hráčům.
+Dále řeší šach/mat a vrací pole, kam nejde v šachu zahrát danému hráči.
+
+
+**autor: Martin Mašata**
