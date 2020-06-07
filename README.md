@@ -21,18 +21,18 @@ Po zahrání tohoto tahu pěscem vyskočí modální okno, které dá na výběr
 ### Engine
 Pro hru nebyl využit žádný framework, ale čistě canvas.
 Využit byl OOP návrh, kde je hra rozdělena na více částí.
--** Game **
+#### Game
 Třída hry, která v sobě uchovává následující části.
 Může je řadit sestupně i vzestupně (v tom se potom odvíjí viditelnost na plátně)
-- **Layer**
+#### Layer
 Vykreslování je rozděleno na vrstvy. Podle nich určujeme, které části vykreslovacích prvků jsem v pozadí, či popředí. Můžeme jimi manipulovat a editovat je přes Game část.
-- **Component**
+#### Component
 Zde jsou konkrétní útvary pro vykreslovaní (čtverce, elipsy, obrázky, ...)
 Ty jsou ukládány do daných vrstev, se kterými dále pracuje hra.
 Každá komponenta má akce, na kliknutí, na drag and drop, atd..  Způsob implementace je ten, že konkrétnímu potomkovi (implementaci komponenty) tzn. injektneme danou metodu s logikou.
-- **Component connector**
+#### Component Connector
 Dopomocná část, která je určena pro spojení více komponent v jednu.
 To se může hodit při akcích na komponenty, jako například při kliknutí, přejetí myši atd..
 Nemusíme opisovat stejnou část kódu vícekrát pro tu samou činnost.
-- **Render Manager**
+#### Render Manager
 Zde se děje veškerá logika vykreslování v Canvasu. Refreshování snímků a akcí.
