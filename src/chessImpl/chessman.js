@@ -14,6 +14,15 @@ export class Chessman extends Component {
                 this.type = type;
                 this.square = null;
                 this.moves = [];
+
+                //sounds
+                this.moveSound = new Audio();
+                this.moveSound.src = '../audio/chessman_move.mp3';
+                this.moveSound.load();
+
+                this.destroySound = new Audio();
+                this.destroySound.src = '../audio/chessman_destroy.mp3';
+                this.destroySound.load();
         }
 
         getColor() {
@@ -83,6 +92,10 @@ export class Chessman extends Component {
                                 //pokud je zde protihracova figurka, pak ji sejme
                                 if(destinationSquare.getChessman() != null){
                                         this.destroyEnemyChessman(destinationSquare);
+                                        this.destroySound.play();
+                                }
+                                else {
+                                        this.moveSound.play();
                                 }
 
                                 this.moveChessman(destinationSquare);
@@ -119,6 +132,9 @@ export class Chessman extends Component {
 
         //ukonci tah hrace
         endPlayerMove(){
+                let turnInfoEl = document.getElementById("colorTurn");
+                turnInfoEl.innerHTML = (turnInfoEl.innerHTML === 'WHITE') ? 'BLACK' : 'WHITE';
+
                 if(this.player.check){
                         //jestlize mel sach, tak ted uz ho mit nemuze.. kdyby byl mat tak by se hra ukoncila
                         this.player.check = !this.player.check;
@@ -400,7 +416,18 @@ export class Knight extends Chessman {
         //vrati vsechny square name, na ktere muze figurka prejit
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
-                return this.getKnightMoves(chessmanPosition);
+                let availableMoves = this.getKnightMoves(chessmanPosition);
+                if(this.player.check){
+                        let possibleKingCheckMoves = this.player.checkBlockData.others;
+                        let checkResult = [];
+                        for(let move of availableMoves){
+                                if(possibleKingCheckMoves.includes(move)){
+                                        checkResult.push(move);
+                                }
+                        }
+                        return checkResult;
+                }
+                return availableMoves;
         }
 
         getKnightMoves(chessmanPosition){
@@ -426,16 +453,6 @@ export class Knight extends Chessman {
                                         availableMoves.push(this.getLetterFromNumber(numberOfLetter)+number);
                                 }
                         }
-                }
-                if(this.player.check){
-                        let possibleKingCheckMoves = this.player.checkBlockData.others;
-                        let checkResult = [];
-                        for(let move of availableMoves){
-                                if(possibleKingCheckMoves.includes(move)){
-                                        checkResult.push(move);
-                                }
-                        }
-                        return checkResult;
                 }
                 return availableMoves;
         }
@@ -561,16 +578,7 @@ export class Queen extends Chessman {
 
         getPossibleMoves(){
                 let chessmanPosition = this.square.getConfig().name;
-                return this.getQueenMoves(chessmanPosition);
-        }
-
-        getQueenMoves(chessmanPosition){
-                let availableMoves = [];
-                let rookMoves = this.rook.getRookMoves(chessmanPosition);
-                let bishopMoves = this.bishop.getBishopMoves(chessmanPosition);
-
-                availableMoves = availableMoves.concat(rookMoves);
-                availableMoves = availableMoves.concat(bishopMoves);
+                let availableMoves =  this.getQueenMoves(chessmanPosition);
                 if(this.player.check){
                         let possibleKingCheckMoves = this.player.checkBlockData.others;
                         let checkResult = [];
@@ -581,6 +589,16 @@ export class Queen extends Chessman {
                         }
                         return checkResult;
                 }
+                return availableMoves;
+        }
+
+        getQueenMoves(chessmanPosition){
+                let availableMoves = [];
+                let rookMoves = this.rook.getRookMoves(chessmanPosition);
+                let bishopMoves = this.bishop.getBishopMoves(chessmanPosition);
+
+                availableMoves = availableMoves.concat(rookMoves);
+                availableMoves = availableMoves.concat(bishopMoves);
                 return availableMoves;
         }
 }

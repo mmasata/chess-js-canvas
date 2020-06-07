@@ -81,5 +81,15 @@ button {
 }
 
 
+.modal-content h1 {
+  text-align: center;
+}
 
-canvas { position: absolute; display: block; }
+.gameInfoMessage{
+  width: 1000px;
+  height: 150px;
+  background-color: #f1f1f1;
+}
+
+
+canvas { display: block; }

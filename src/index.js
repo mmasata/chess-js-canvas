@@ -7,14 +7,18 @@ const init = () => {
 
         //pridani dvou hracu
         let players = [
-                new Player("BOB"),
-                new Player("TOM")
+                new Player("1"),
+                new Player("2")
         ];
 
         //inicializace sachovnice
         const chessboardLayer  = new Chessboard('Chessboard_layer', true, game, players);
         game.addLayer(chessboardLayer);
         game.addLayer(chessboardLayer.chessmanLayer);
+
+
+        //menu
+        document.getElementById("mainMenu").style.display = 'none';
 }
 
 
@@ -38,4 +42,9 @@ document.addEventListener('keydown', (evt)=>{
                 let menuVisibility = menu.style.display;
                 menu.style.display = (menuVisibility === 'none') ? 'block' : 'none';
         }
+});
+document.getElementById("new-game").addEventListener('click' , ()=>{
+        game.removeLayerByName('Chessboard_layer');
+        game.removeLayerByName('Chessman_Layer');
+        init();
 });

@@ -53,8 +53,14 @@ export class Chessboard extends Layer{
                              this.activePlayer = pl;
                              if(isCheck){
                                      if(this._isCheckmate(attackChessman)){
-                                        console.log('sach mat, konecna');
+                                        document.getElementById("gameMessage").innerHTML = 'Check mate';
                                      }
+                                     else {
+                                        document.getElementById("gameMessage").innerHTML = 'Check';
+                                     }
+                             }
+                             else {
+                                document.getElementById("gameMessage").innerHTML = '';  
                              }
                              return;
                      }
