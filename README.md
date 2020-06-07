@@ -17,6 +17,8 @@ Tým, který je pod útokem bude mít následně vyfiltrované tahy jen na ty, k
 ### Proměna
 Pokud se hráč dostane s pěšákem na konec šachovnice, je mu umožněna takzvaná "Proměna".  To znamená, že si může pěsce vyměnit permanentně za jinou, silnější figurku.
 Po zahrání tohoto tahu pěscem vyskočí modální okno, které dá na výběr cílovou figurku proměny.
+### Menu
+Menu se dá otevřít či zavřít tlačítkem Escape. Zde je pouze možnost pro novou hru. Tím se hra přenačte do defaultních pozic figurek.
 ## Dokumentace
 ### Engine
 Pro hru nebyl využit žádný framework, ale čistě canvas.
